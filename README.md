@@ -6,17 +6,17 @@ A command-line interface for browser automation using AI agents.
 
 1. Create a virtual environment:
 ```bash
-python -m venv venv
+python -m venv .venv
 ```
 
 2. Activate the virtual environment:
 - Windows:
 ```bash
-venv\Scripts\activate
+.venv\Scripts\activate
 ```
 - Unix/MacOS:
 ```bash
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
 3. Install dependencies:
@@ -38,11 +38,15 @@ ANONYMIZED_TELEMETRY=true
 
 ## Usage
 
-The CLI provides several commands for browser automation:
+The CLI provides several commands for browser automation. All results are automatically saved as markdown files in the `results` directory with timestamps.
 
 ### General Task Execution
 ```bash
 python app.py run "your task description"
+```
+You can also run without providing a task, and you'll be prompted interactively:
+```bash
+python app.py run
 ```
 
 Example:
@@ -80,6 +84,14 @@ All commands support the following options:
 - `--model`, `-m`: Specify the OpenAI model to use (default: "gpt-4")
 - `--api-key`, `-k`: Provide OpenAI API key directly (optional if set in .env)
 
+## Output
+
+All task results are automatically saved as markdown files in the `results` directory. Each file includes:
+- Timestamp of execution
+- Task description
+- Task result
+Files are named in the format: `task_YYYYMMDD_HHMMSS.md`
+
 ## Examples
 
 1. Search for a product:
@@ -95,3 +107,9 @@ python app.py search "wikipedia.org" "history of artificial intelligence"
 3. Find flights:
 ```bash
 python app.py flights "San Francisco" "Tokyo" "2024-06-15" --return-date "2024-06-30"
+```
+
+4. Interactive task:
+```bash
+python app.py run
+# You will be prompted to enter your task
