@@ -6,6 +6,8 @@ from browser_use import Agent
 from typing import Optional
 import os
 from dotenv import load_dotenv
+from datetime import datetime
+import questionary
 
 # Load environment variables
 load_dotenv()
@@ -22,7 +24,38 @@ class BrowserUseCLI:
             llm=self.llm,
         )
         result = await agent.run()
+        
+        # Save result as markdown
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"results/task_{timestamp}.md"
+        
+        # Create results directory if it doesn't exist
+        os.makedirs("results", exist_ok=True)
+        
+        # Format the markdown content
+        markdown_content = f"""# Task Result - {timestamp}
+
+## Task Description
+{task}
+
+## Result
+{result}
+"""
+        
+        # Save to file
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+            
+        print(f"\nResult saved to: {filename}")
+        print("\nResult:")
         print(result)
+
+def prompt_for_task() -> str:
+    """Prompt the user for a task description"""
+    return questionary.text(
+        "What task would you like to execute?",
+        validate=lambda text: len(text.strip()) > 0
+    ).ask()
 
 @click.group()
 def cli():
@@ -30,11 +63,13 @@ def cli():
     pass
 
 @cli.command()
-@click.argument('task', required=True)
+@click.argument('task', required=False)
 @click.option('--model', '-m', default="gpt-4", help='OpenAI model to use')
 @click.option('--api-key', '-k', help='OpenAI API key (optional if set in .env)')
-def run(task: str, model: str, api_key: Optional[str]):
+def run(task: Optional[str], model: str, api_key: Optional[str]):
     """Execute a browser automation task"""
+    if not task:
+        task = prompt_for_task()
     browser_cli = BrowserUseCLI(model=model, api_key=api_key)
     asyncio.run(browser_cli.execute_task(task))
 
