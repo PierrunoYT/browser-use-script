@@ -13,7 +13,7 @@ import questionary
 load_dotenv()
 
 class BrowserUseCLI:
-    def __init__(self, model: str = "gpt-4", api_key: Optional[str] = None):
+    def __init__(self, model: str = "gpt-4o", api_key: Optional[str] = None):
         if api_key:
             os.environ["OPENAI_API_KEY"] = api_key
         self.llm = ChatOpenAI(model=model)
@@ -64,7 +64,7 @@ def cli():
 
 @cli.command()
 @click.argument('task', required=False)
-@click.option('--model', '-m', default="gpt-4", help='OpenAI model to use')
+@click.option('--model', '-m', default="gpt-4o", help='OpenAI model to use')
 @click.option('--api-key', '-k', help='OpenAI API key (optional if set in .env)')
 def run(task: Optional[str], model: str, api_key: Optional[str]):
     """Execute a browser automation task"""
@@ -76,7 +76,7 @@ def run(task: Optional[str], model: str, api_key: Optional[str]):
 @cli.command()
 @click.argument('url')
 @click.argument('query')
-@click.option('--model', '-m', default="gpt-4", help='OpenAI model to use')
+@click.option('--model', '-m', default="gpt-4o", help='OpenAI model to use')
 @click.option('--api-key', '-k', help='OpenAI API key (optional if set in .env)')
 def search(url: str, query: str, model: str, api_key: Optional[str]):
     """Search and extract information from a specific website"""
@@ -89,7 +89,7 @@ def search(url: str, query: str, model: str, api_key: Optional[str]):
 @click.argument('to_location')
 @click.argument('date')
 @click.option('--return-date', '-r', help='Return date for round trip')
-@click.option('--model', '-m', default="gpt-4", help='OpenAI model to use')
+@click.option('--model', '-m', default="gpt-4o", help='OpenAI model to use')
 @click.option('--api-key', '-k', help='OpenAI API key (optional if set in .env)')
 def flights(from_location: str, to_location: str, date: str, 
            return_date: Optional[str], model: str, api_key: Optional[str]):
