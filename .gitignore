@@ -25,6 +25,7 @@ venv/
 ENV/
 env/
 .env
+.venv/
 
 # IDE
 .idea/
@@ -43,3 +44,6 @@ playwright/.cache/
 # Logs
 *.log
 logs/
+
+# Task Results
+results/
