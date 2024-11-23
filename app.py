@@ -8,6 +8,8 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import questionary
+from rich.markdown import Markdown
+from rich.console import Console
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +19,7 @@ class BrowserUseCLI:
         if api_key:
             os.environ["OPENAI_API_KEY"] = api_key
         self.llm = ChatOpenAI(model=model)
+        self.console = Console()
         
     async def execute_task(self, task: str) -> None:
         agent = Agent(
@@ -46,9 +49,10 @@ class BrowserUseCLI:
         with open(filename, "w", encoding="utf-8") as f:
             f.write(markdown_content)
             
-        print(f"\nResult saved to: {filename}")
-        print("\nResult:")
-        print(result)
+        # Print formatted markdown to console
+        self.console.print(f"\nResult saved to: {filename}")
+        self.console.print("\nResult:")
+        self.console.print(Markdown(markdown_content))
 
 def prompt_for_task() -> str:
     """Prompt the user for a task description"""
