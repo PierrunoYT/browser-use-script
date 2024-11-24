@@ -9,10 +9,26 @@ On Windows, simply run the PowerShell script to set up and start the application
 .\start_app.ps1
 ```
 This script will:
-1. Activate the virtual environment
-2. Start the application in continuous execution mode
+1. Create a virtual environment (if it doesn't exist)
+2. Activate the virtual environment
+3. Install all required dependencies
+4. Install Playwright browsers
+5. Start the application in continuous execution mode
+
+The only prerequisite is having Python installed on your system.
+
+## Environment Setup
+
+Before running the application, make sure to set up your environment variables in `.env`:
+```
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+ANONYMIZED_TELEMETRY=true
+```
 
 ## Manual Installation
+
+If you prefer to set up the environment manually, follow these steps:
 
 1. Create a virtual environment:
 ```bash
@@ -37,13 +53,6 @@ pip install -r requirements.txt
 4. Install Playwright browsers:
 ```bash
 playwright install
-```
-
-5. Set up environment variables in `.env`:
-```
-OPENAI_API_KEY=your_openai_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
-ANONYMIZED_TELEMETRY=true
 ```
 
 ## Usage
