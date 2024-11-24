@@ -1,8 +1,18 @@
 # Browser Use CLI
 
-A command-line interface for browser automation using AI agents.
+A command-line interface for browser automation using AI agents. This tool helps automate various browser-based tasks including web searches, flight searches, and general browser automation tasks.
 
-## Installation
+## Quick Start
+
+On Windows, simply run the PowerShell script to set up and start the application:
+```powershell
+.\start_app.ps1
+```
+This script will:
+1. Activate the virtual environment
+2. Start the application in continuous execution mode
+
+## Manual Installation
 
 1. Create a virtual environment:
 ```bash
@@ -11,8 +21,8 @@ python -m venv .venv
 
 2. Activate the virtual environment:
 - Windows:
-```bash
-.venv\Scripts\activate
+```powershell
+.\.venv\Scripts\activate
 ```
 - Unix/MacOS:
 ```bash
@@ -42,11 +52,13 @@ The CLI provides several commands for browser automation. All results are automa
 
 ### General Task Execution
 ```bash
-python app.py run "your task description"
-```
-You can also run without providing a task, and you'll be prompted interactively:
-```bash
 python app.py run
+```
+This will start an interactive session where you can input your automation tasks.
+
+You can also provide a task directly:
+```bash
+python app.py run "your task description"
 ```
 
 Example:
@@ -90,6 +102,7 @@ All task results are automatically saved as markdown files in the `results` dire
 - Timestamp of execution
 - Task description
 - Task result
+
 Files are named in the format: `task_YYYYMMDD_HHMMSS.md`
 
 ## Examples
@@ -101,15 +114,9 @@ python app.py run "Find the price of iPhone 15 Pro on Amazon"
 
 2. Research a topic:
 ```bash
-python app.py search "wikipedia.org" "history of artificial intelligence"
+python app.py run "Research and summarize recent developments in AI"
 ```
 
-3. Find flights:
+3. Compare prices:
 ```bash
-python app.py flights "San Francisco" "Tokyo" "2024-06-15" --return-date "2024-06-30"
-```
-
-4. Interactive task:
-```bash
-python app.py run
-# You will be prompted to enter your task
+python app.py run "Compare prices of MacBook Pro across different retailers"
