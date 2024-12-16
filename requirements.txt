@@ -1,0 +1,11 @@
+browser-use==0.1.8
+click==8.1.7
+python-dotenv==1.0.1
+langchain-openai==0.2.9
+langchain==0.3.8
+lxml_html_clean==0.4.1
+openai==1.55.0
+playwright==1.49.0
+pydantic==2.10.1
+questionary==2.0.1
+rich
