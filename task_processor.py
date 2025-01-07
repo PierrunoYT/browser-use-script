@@ -3,7 +3,15 @@ import os
 from pathlib import Path
 from typing import List, Dict
 import asyncio
-from cli import run_browser_script
+from langchain_openai import ChatOpenAI
+from browser_use import Agent, Browser, BrowserConfig, Controller
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Initialize controller for custom actions
+controller = Controller()
 
 async def load_tasks(json_file_path: str) -> List[Dict]:
     """Load tasks from a JSON file."""
@@ -11,30 +19,30 @@ async def load_tasks(json_file_path: str) -> List[Dict]:
         data = json.load(f)
     return data['tasks']
 
-async def process_task(task: Dict) -> Dict:
+async def process_task(task: Dict, browser: Browser = None) -> Dict:
     """Process a single task using browser-use-script."""
     # Ensure directories exist
     Path(task['save_path']).mkdir(parents=True, exist_ok=True)
     Path(task['screenshot_dir']).mkdir(parents=True, exist_ok=True)
     
-    # Prepare the script configuration
-    script_config = {
-        'website': task['website'],
-        'search_prompt': task['search_prompt'],
-        'response_string': task['response_string'],
-        'save_path': task['save_path'],
-        'screenshot_dir': task['screenshot_dir']
-    }
-    
     try:
         print(f"Starting task for website: {task['website']}")
-        # Run the browser script for this task
-        result = await run_browser_script(script_config)
+        
+        # Initialize agent with task
+        agent = Agent(
+            task=task['search_prompt'],
+            llm=ChatOpenAI(model="gpt-4"),
+            controller=controller
+        )
+        
+        # Run the task
+        history = await agent.run()
+        
         print(f"✓ Successfully completed task for {task['website']}")
         return {
             'task': task,
             'success': True,
-            'result': result
+            'history': history
         }
     except Exception as e:
         print(f"✗ Failed task for {task['website']}: {str(e)}")
@@ -62,6 +70,11 @@ async def process_all_tasks(tasks_file: str):
             website = result['task']['website']
             if result['success']:
                 print(f"Task for {website}: Success")
+                # Save results if needed
+                save_path = result['task']['save_path']
+                os.makedirs(save_path, exist_ok=True)
+                with open(os.path.join(save_path, 'result.json'), 'w') as f:
+                    json.dump(result['history'], f, indent=2)
             else:
                 print(f"Task for {website}: Failed - {result.get('error', 'Unknown error')}")
         else:
