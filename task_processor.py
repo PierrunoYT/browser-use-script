@@ -70,7 +70,7 @@ async def process_task(task: Dict, browser: Browser = None) -> Dict:
         # Initialize agent with task and browser
         agent = Agent(
             task=task_description,
-            llm=ChatOpenAI(model="gpt-4"),
+            llm=ChatOpenAI(model="gpt-4o"),
             controller=controller,
             browser=browser
         )
