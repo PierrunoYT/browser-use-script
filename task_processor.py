@@ -44,81 +44,87 @@ def serialize_history(history):
         serialized.append(entry)
     return serialized
 
-async def process_task(task: Dict, browser: Browser = None) -> Dict:
-    """Process a single task using browser-use-script."""
+async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
+    """Process a single task using browser-use-script with retry mechanism."""
     # Ensure directories exist
     Path(task['save_path']).mkdir(parents=True, exist_ok=True)
     Path(task['screenshot_dir']).mkdir(parents=True, exist_ok=True)
     
-    try:
-        print(f"Starting task for website: {task['website']}")
-        
-        # Create a combined task description that includes all paths and validation
-        task_description = (
-            f"Go to {task['website']} and {task['search_prompt']}. "
-            f"Verify that '{task['response_string']}' appears on the page. "
-            f"Save any screenshots to {task['screenshot_dir']}. "
-            f"Save any extracted data or results to {task['save_path']}."
-        )
-        
-        # Initialize browser config and browser
-        browser_config = BrowserConfig(
-            headless=False  # Make browser visible for debugging
-        )
-        browser = Browser(config=browser_config)
-        
-        # Initialize agent with task and browser
-        agent = Agent(
-            task=task_description,
-            llm=ChatOpenAI(model="gpt-4o"),
-            controller=controller,
-            browser=browser
-        )
-        
-        # Run the task
-        history = await agent.run()
-        
-        print(f"✓ Successfully completed task for {task['website']}")
-        return {
-            'task': task,
-            'success': True,
-            'history': serialize_history(history)
-        }
-    except Exception as e:
-        print(f"✗ Failed task for {task['website']}: {str(e)}")
-        return {
-            'task': task,
-            'success': False,
-            'error': str(e)
-        }
+    browser = None
+    attempt = 1
+    
+    while attempt <= max_attempts:
+        try:
+            print(f"Processing task for {task['website']} (Attempt {attempt}/{max_attempts})")
+            
+            # Create a combined task description
+            task_description = (
+                f"Go to {task['website']} and {task['search_prompt']}. "
+                f"Verify that '{task['response_string']}' appears on the page. "
+                f"Save any screenshots to {task['screenshot_dir']}. "
+                f"Save any extracted data or results to {task['save_path']}."
+            )
+            
+            # Initialize browser if not exists
+            if not browser:
+                browser_config = BrowserConfig(headless=False)
+                browser = Browser(config=browser_config)
+            
+            # Initialize agent with task and browser
+            agent = Agent(
+                task=task_description,
+                llm=ChatOpenAI(model="gpt-4"),
+                controller=controller,
+                browser=browser
+            )
+            
+            # Run the task
+            history = await agent.run()
+            
+            print(f"✓ Successfully completed task for {task['website']}")
+            return {
+                'task': task,
+                'success': True,
+                'attempts': attempt,
+                'history': serialize_history(history)
+            }
+            
+        except Exception as e:
+            print(f"✗ Attempt {attempt} failed for {task['website']}: {str(e)}")
+            if browser:
+                await browser.close()
+                browser = None
+            
+            if attempt == max_attempts:
+                return {
+                    'task': task,
+                    'success': False,
+                    'attempts': attempt,
+                    'error': str(e)
+                }
+            
+            attempt += 1
+            await asyncio.sleep(2)  # Wait before retrying
+    
+    return {
+        'task': task,
+        'success': False,
+        'attempts': max_attempts,
+        'error': 'Maximum attempts reached'
+    }
 
 async def process_all_tasks(tasks_file: str):
-    """Process all tasks from the JSON file concurrently."""
+    """Process tasks from the JSON file one at a time."""
     tasks = await load_tasks(tasks_file)
+    results = []
     
-    # Create all tasks concurrently
-    tasks_coroutines = [process_task(task) for task in tasks]
-    results = await asyncio.gather(*tasks_coroutines, return_exceptions=True)
-    
-    # Process results
-    successful = sum(1 for r in results if isinstance(r, dict) and r.get('success', False))
-    print(f"\nProcessing complete: {successful}/{len(results)} tasks successful")
-    
-    # Print detailed results
-    for result in results:
-        if isinstance(result, dict):
-            website = result['task']['website']
-            if result['success']:
-                print(f"Task for {website}: Success")
-                # Save results if needed
-                save_path = result['task']['save_path']
-                os.makedirs(save_path, exist_ok=True)
-                with open(os.path.join(save_path, 'result.json'), 'w') as f:
-                    json.dump(result['history'], f, indent=2)
-            else:
-                print(f"Task for {website}: Failed - {result.get('error', 'Unknown error')}")
-        else:
-            print(f"Task failed with unexpected error: {str(result)}")
+    for task in tasks:
+        result = await process_task(task)
+        results.append(result)
+        
+        # Save progress after each task
+        with open('task_results.json', 'w') as f:
+            json.dump({'results': results}, f, indent=2)
     
     return results
 
