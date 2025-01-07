@@ -73,9 +73,6 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
             
             if browser is None:
                 browser = Browser(config=browser_config)
-                
-            # Ensure the browser is ready
-            await browser.new_page()
             
             # Initialize agent with task and browser
             agent = Agent(
