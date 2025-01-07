@@ -44,8 +44,13 @@ async def process_task(task: Dict, browser: Browser = None) -> Dict:
     try:
         print(f"Starting task for website: {task['website']}")
         
-        # Create a combined task description that includes the website and validation
-        task_description = f"Go to {task['website']} and {task['search_prompt']}. Verify that '{task['response_string']}' appears on the page. Save any screenshots to {task['screenshot_dir']}."
+        # Create a combined task description that includes all paths and validation
+        task_description = (
+            f"Go to {task['website']} and {task['search_prompt']}. "
+            f"Verify that '{task['response_string']}' appears on the page. "
+            f"Save any screenshots to {task['screenshot_dir']}. "
+            f"Save any extracted data or results to {task['save_path']}."
+        )
         
         # Initialize browser config
         browser_config = BrowserConfig(
