@@ -26,11 +26,20 @@ def serialize_history(history):
     
     serialized = []
     for item in history:
+        # Handle case where item is a tuple
+        if isinstance(item, tuple):
+            action, input_val, output, timestamp = item
+        else:
+            action = getattr(item, 'action', 'unknown')
+            input_val = getattr(item, 'input', '')
+            output = getattr(item, 'output', '')
+            timestamp = getattr(item, 'timestamp', '')
+            
         entry = {
-            'action': str(item.action),
-            'input': str(item.input),
-            'output': str(item.output),
-            'timestamp': str(item.timestamp)
+            'action': str(action),
+            'input': str(input_val),
+            'output': str(output),
+            'timestamp': str(timestamp)
         }
         serialized.append(entry)
     return serialized
