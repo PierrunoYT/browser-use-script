@@ -59,11 +59,11 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
             
             # Create a combined task description that includes all paths and validation
             task_description = (
-                f"1. Navigate directly to {task['website']} and wait for the page to load completely.\n"
-                f"2. Once loaded, {task['search_prompt']}.\n"
-                f"3. Wait for and verify that '{task['response_string']}' appears on the page.\n"
-                f"4. Save any screenshots to {task['screenshot_dir']}.\n"
-                f"5. Save any extracted data or results to {task['save_path']}."
+                f"1. Go to {task['website']}\n"
+                f"2. {task['search_prompt']}\n"
+                f"3. Verify text: '{task['response_string']}'\n"
+                f"4. Save screenshots: {task['screenshot_dir']}\n"
+                f"5. Save results: {task['save_path']}"
             )
             
             # Initialize browser config and browser
@@ -80,10 +80,12 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
                 llm=ChatOpenAI(
                     model="gpt-4o",
                     temperature=0,  # More deterministic responses
-                    max_retries=2  # Limit retries on failure
+                    max_retries=2,  # Limit retries on failure
+                    max_tokens=1000  # Limit response length
                 ),
                 controller=controller,
-                browser=browser
+                browser=browser,
+                memory_size=5  # Limit conversation history
             )
             
             # Run the task
