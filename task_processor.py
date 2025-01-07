@@ -19,6 +19,22 @@ async def load_tasks(json_file_path: str) -> List[Dict]:
         data = json.load(f)
     return data['tasks']
 
+def serialize_history(history):
+    """Convert agent history to JSON serializable format."""
+    if history is None:
+        return []
+    
+    serialized = []
+    for item in history:
+        entry = {
+            'action': str(item.action),
+            'input': str(item.input),
+            'output': str(item.output),
+            'timestamp': str(item.timestamp)
+        }
+        serialized.append(entry)
+    return serialized
+
 async def process_task(task: Dict, browser: Browser = None) -> Dict:
     """Process a single task using browser-use-script."""
     # Ensure directories exist
@@ -42,7 +58,7 @@ async def process_task(task: Dict, browser: Browser = None) -> Dict:
         return {
             'task': task,
             'success': True,
-            'history': history
+            'history': serialize_history(history)
         }
     except Exception as e:
         print(f"✗ Failed task for {task['website']}: {str(e)}")
