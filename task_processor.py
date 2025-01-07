@@ -31,7 +31,7 @@ async def process_task(task: Dict, browser: Browser = None) -> Dict:
         # Initialize agent with task
         agent = Agent(
             task=task['search_prompt'],
-            llm=ChatOpenAI(model="gpt-4"),
+            llm=ChatOpenAI(model="gpt-4o"),
             controller=controller
         )
         
