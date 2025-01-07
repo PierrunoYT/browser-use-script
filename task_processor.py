@@ -44,11 +44,18 @@ async def process_task(task: Dict, browser: Browser = None) -> Dict:
     try:
         print(f"Starting task for website: {task['website']}")
         
-        # Initialize agent with task
+        # Initialize browser config with the target website
+        browser_config = BrowserConfig(
+            start_url=task['website'],
+            screenshot_dir=task['screenshot_dir']
+        )
+        
+        # Initialize agent with task and browser config
         agent = Agent(
             task=task['search_prompt'],
             llm=ChatOpenAI(model="gpt-4o"),
-            controller=controller
+            controller=controller,
+            browser_config=browser_config
         )
         
         # Run the task
