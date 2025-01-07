@@ -57,13 +57,11 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
         try:
             print(f"Processing task for {task['website']} (Attempt {attempt}/{max_attempts})")
             
-            # Create a combined task description that includes all paths and validation
+            # Create task description
             task_description = (
-                f"1. Go to {task['website']}\n"
-                f"2. {task['search_prompt']}\n"
-                f"3. Verify text: '{task['response_string']}'\n"
-                f"4. Save screenshots: {task['screenshot_dir']}\n"
-                f"5. Save results: {task['save_path']}"
+                f"Go to {task['website']} and {task['search_prompt']}. "
+                f"Make sure '{task['response_string']}' appears on the page. "
+                f"Save any results to {task['save_path']}."
             )
             
             # Initialize browser config and browser
@@ -74,22 +72,14 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
             if browser is None:
                 browser = Browser(config=browser_config)
             
-            # Initialize agent with task and browser
+            # Initialize agent with task
             agent = Agent(
                 task=task_description,
-                llm=ChatOpenAI(
-                    model="gpt-4o",
-                    temperature=0,  # More deterministic responses
-                    max_retries=2,  # Limit retries on failure
-                    max_tokens=1000  # Limit response length
-                ),
-                controller=controller,
-                browser=browser,
-                memory_size=5  # Limit conversation history
+                llm=ChatOpenAI(model="gpt-4o")
             )
             
             # Run the task
-            history = await agent.run()
+            result = await agent.run()
             
             print(f"✓ Successfully completed task for {task['website']}")
             if browser:
@@ -99,7 +89,7 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
                 'task': task,
                 'success': True,
                 'attempts': attempt,
-                'history': serialize_history(history)
+                'history': serialize_history(result)
             }
             
         except Exception as e:
