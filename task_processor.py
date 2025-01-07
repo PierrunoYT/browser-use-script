@@ -57,23 +57,34 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
         try:
             print(f"Processing task for {task['website']} (Attempt {attempt}/{max_attempts})")
             
-            # Create a combined task description
+            # Create a combined task description that includes all paths and validation
             task_description = (
-                f"Go to {task['website']} and {task['search_prompt']}. "
-                f"Verify that '{task['response_string']}' appears on the page. "
-                f"Save any screenshots to {task['screenshot_dir']}. "
-                f"Save any extracted data or results to {task['save_path']}."
+                f"1. Navigate directly to {task['website']} and wait for the page to load completely.\n"
+                f"2. Once loaded, {task['search_prompt']}.\n"
+                f"3. Wait for and verify that '{task['response_string']}' appears on the page.\n"
+                f"4. Save any screenshots to {task['screenshot_dir']}.\n"
+                f"5. Save any extracted data or results to {task['save_path']}."
             )
             
-            # Initialize browser if not exists
-            if not browser:
-                browser_config = BrowserConfig(headless=False)
+            # Initialize browser config and browser
+            browser_config = BrowserConfig(
+                headless=False  # Make browser visible for debugging
+            )
+            
+            if browser is None:
                 browser = Browser(config=browser_config)
+                
+            # Ensure the browser is ready
+            await browser.new_page()
             
             # Initialize agent with task and browser
             agent = Agent(
                 task=task_description,
-                llm=ChatOpenAI(model="gpt-4"),
+                llm=ChatOpenAI(
+                    model="gpt-4o",
+                    temperature=0,  # More deterministic responses
+                    max_retries=2  # Limit retries on failure
+                ),
                 controller=controller,
                 browser=browser
             )
