@@ -52,17 +52,18 @@ async def process_task(task: Dict, browser: Browser = None) -> Dict:
             f"Save any extracted data or results to {task['save_path']}."
         )
         
-        # Initialize browser config
+        # Initialize browser config and browser
         browser_config = BrowserConfig(
             headless=False  # Make browser visible for debugging
         )
+        browser = Browser(config=browser_config)
         
-        # Initialize agent with task and browser config
+        # Initialize agent with task and browser
         agent = Agent(
             task=task_description,
-            llm=ChatOpenAI(model="gpt-4o"),
+            llm=ChatOpenAI(model="gpt-4"),
             controller=controller,
-            browser_config=browser_config
+            browser=browser
         )
         
         # Run the task
