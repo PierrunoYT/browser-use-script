@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 
-class TestBrowserUse(unittest.TestCase):
+class TestBrowserUse(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.sample_tasks = {
             "tasks": [
@@ -54,9 +54,6 @@ class TestBrowserUse(unittest.TestCase):
         self.assertEqual(serialized[0]['action'], 'action1')
         self.assertEqual(serialized[0]['input'], 'input1')
         self.assertEqual(serialized[0]['output'], 'output1')
-
-def run_async_test(coro):
-    return asyncio.run(coro)
 
 if __name__ == '__main__':
     unittest.main()
