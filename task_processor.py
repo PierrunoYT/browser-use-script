@@ -90,6 +90,9 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
             history = await agent.run()
             
             print(f"✓ Successfully completed task for {task['website']}")
+            if browser:
+                await browser.close()
+            
             return {
                 'task': task,
                 'success': True,
@@ -125,14 +128,28 @@ async def process_all_tasks(tasks_file: str):
     """Process tasks from the JSON file one at a time."""
     tasks = await load_tasks(tasks_file)
     results = []
+    browser = None
     
     for task in tasks:
-        result = await process_task(task)
-        results.append(result)
-        
-        # Save progress after each task
-        with open('task_results.json', 'w') as f:
-            json.dump({'results': results}, f, indent=2)
+        try:
+            result = await process_task(task)
+            results.append(result)
+            
+            # Save progress after each task
+            with open('task_results.json', 'w') as f:
+                json.dump({'results': results}, f, indent=2)
+                
+        except Exception as e:
+            print(f"Failed to process task for {task['website']}: {str(e)}")
+            results.append({
+                'task': task,
+                'success': False,
+                'error': str(e)
+            })
+        finally:
+            if browser:
+                await browser.close()
+                browser = None
     
     return results
 
