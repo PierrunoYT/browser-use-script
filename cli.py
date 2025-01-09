@@ -9,7 +9,6 @@ from browser_use import Agent
 # Load environment variables from .env file
 load_dotenv()
 
-@controller.action('Ask user for information')
 def ask_human(question: str, display_question: bool = True) -> str:
     return input(f'\n{question}\nInput: ') if display_question else input()
 
