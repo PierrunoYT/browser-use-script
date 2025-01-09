@@ -10,8 +10,6 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Initialize controller for custom actions
-controller = Controller()
 
 async def load_tasks(json_file_path: str) -> List[Dict]:
     """Load tasks from a JSON file."""
