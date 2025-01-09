@@ -4,13 +4,10 @@ from typing import Optional
 import json
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from browser_use import Agent, Browser, BrowserConfig, Controller
+from browser_use import Agent
 
 # Load environment variables from .env file
 load_dotenv()
-
-# Initialize controller for custom actions
-controller = Controller()
 
 @controller.action('Ask user for information')
 def ask_human(question: str, display_question: bool = True) -> str:
@@ -41,8 +38,7 @@ async def main(browser=None, context=None):
             # Initialize agent with task
             agent = Agent(
                 task=task,
-                llm=ChatOpenAI(model="gpt-4o"),  # Using standard GPT-4 model
-                controller=controller
+                llm=ChatOpenAI(model="gpt-4"),  # Using standard GPT-4 model
             )
             print("\nExecuting task...")
             try:

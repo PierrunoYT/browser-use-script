@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Dict
 import asyncio
 from langchain_openai import ChatOpenAI
-from browser_use import Agent, Browser, BrowserConfig, Controller
+from browser_use import Agent
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -65,17 +65,11 @@ async def process_task(task: Dict, max_attempts: int = 3) -> Dict:
             )
             
             # Initialize browser config and browser
-            browser_config = BrowserConfig(
-                headless=False  # Make browser visible for debugging
-            )
-            
-            if browser is None:
-                browser = Browser(config=browser_config)
-            
             # Initialize agent with task
             agent = Agent(
                 task=task_description,
-                llm=ChatOpenAI(model="gpt-4o")
+                llm=ChatOpenAI(model="gpt-4"),
+                headless=False  # Make browser visible for debugging
             )
             
             # Run the task
