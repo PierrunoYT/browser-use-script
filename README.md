@@ -2,6 +2,14 @@
 
 An interactive CLI tool for browser automation using the [browser-use](https://github.com/browser-use/browser-use) library. This tool allows you to control your browser using natural language commands through an interactive command-line interface.
 
+## Prerequisites
+
+1. **OpenAI API Key**: Required for GPT-4 integration. Get it from [OpenAI's platform](https://platform.openai.com/api-keys)
+2. **Browser Use API Key**: Optional but recommended. Get it by:
+   - Visiting [browser-use GitHub repository](https://github.com/browser-use/browser-use)
+   - Following their documentation for API key generation
+   - Note: The tool works without this key but may have limited functionality
+
 ## Features
 
 - Interactive CLI for continuous browser automation tasks
