@@ -13,8 +13,8 @@ An interactive CLI tool for browser automation using the [browser-use](https://g
 
 1. Clone this repository:
 ```bash
-git clone [your-repo-url]
-cd [your-repo-name]
+git clone https://github.com/PierrunoYT/browser-use-script
+cd browser-use-script
 ```
 
 2. Install the required packages:
