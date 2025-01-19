@@ -1,97 +1,89 @@
-# 🌐 Browser-Use CLI
+# Browser Use CLI
 
-A command-line interface tool that uses AI to automate browser-based tasks.
+An interactive CLI tool for browser automation using the [browser-use](https://github.com/browser-use/browser-use) library. This tool allows you to control your browser using natural language commands through an interactive command-line interface.
 
-## ✨ Features
+## Features
 
-- Interactive CLI interface for task execution
-- Powered by GPT-4 for intelligent browser automation
-- Built with Playwright for reliable web automation
-- Continuous operation mode with exit prompt
+- Interactive CLI for continuous browser automation tasks
+- Powered by GPT-4 and browser-use
+- Simple setup and usage
+- Graceful exit handling
 
-## 📋 Prerequisites
+## Setup
 
-- Python 3.8 or higher
-- OpenAI API key
-- Playwright browser automation tool
-
-## 🚀 Installation
-
-1. Clone the repository:
+1. Clone this repository:
 ```bash
-git clone https://github.com/PierrunoYT/browser-use-script
-cd browser-use-script
+git clone [your-repo-url]
+cd [your-repo-name]
 ```
 
-2. Create and activate a virtual environment:
-
-On Windows:
-```bash
-python -m venv venv
-.\venv\Scripts\activate
-```
-
-On macOS/Linux:
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. Install required packages:
+2. Install the required packages:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Install Playwright browsers:
+3. Install playwright browsers:
 ```bash
 playwright install
 ```
 
-4. Set up environment variables:
-   - Copy `.env.example` to `.env`
-   - Add your OpenAI API key to `.env`
-   - (Optional) Add Anthropic API key if using Claude models
-   - Configure telemetry settings as needed
-
-## 🎯 Usage
-
-1. Run the CLI:
+4. Set up your environment variables:
 ```bash
-python cli.py
+cp .env.example .env
 ```
 
-2. Enter your task when prompted (e.g., "Find flights from NYC to London")
+5. Edit the `.env` file and add your API keys:
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+BROWSER_USE_API_KEY=your_browser_use_api_key_here  # Optional
+```
 
-3. The tool will execute your task using browser automation
+## Usage
 
-4. After task completion, you can:
-   - View the detailed action history
-   - Save results to a file
-   - Continue with another task (enter "no" at exit prompt)
-   - Exit the program (enter "yes" at exit prompt)
+1. Start the CLI:
+```bash
+python main.py
+```
 
-## 📦 Dependencies
+2. Enter your browser automation tasks when prompted. For example:
+```
+Welcome to Browser Use CLI!
+Enter your tasks and watch the browser automation in action.
+Press Ctrl+C to exit.
 
-All required dependencies are listed in `requirements.txt`:
-- langchain
+Enter your browser task (Ctrl+C to exit):
+> Go to Reddit and search for "browser-use"
+```
+
+3. The tool will execute your task and show the results.
+
+4. Continue entering new tasks or exit:
+   - Press Ctrl+C to exit
+   - Type 'exit' or 'quit' to close the program
+   - Enter a new task to continue automation
+
+## Example Tasks
+
+Here are some example tasks you can try:
+
+- "Go to Reddit, search for 'browser-use' and return the first post's title"
+- "Search for flights on kayak.com from New York to London"
+- "Go to Google Docs and create a new document titled 'Meeting Notes'"
+- "Visit GitHub and star the browser-use repository"
+
+## Dependencies
+
 - langchain-openai
-- python-dotenv
 - browser-use
 - playwright
+- python-dotenv
 - lxml
 - lxml-html-clean
 
-## ⚠️ Error Handling
+## Contributing
 
-If you encounter errors, ensure:
-1. Your OpenAI API key is correctly set in `.env`
-2. All dependencies are properly installed
-3. Playwright browsers are installed
+Contributions are welcome! Feel free to open issues for bugs or feature requests.
 
-## 👥 Contributing
+## License
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -1,7 +1,6 @@
-langchain
 langchain-openai
-python-dotenv
 browser-use
 playwright
+python-dotenv
 lxml
 lxml-html-clean
