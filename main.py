@@ -57,15 +57,19 @@ def get_llm_model(provider: str = None):
         print(f"Warning: Unsupported provider '{provider}'. Falling back to OpenAI.")
         provider = LLMProvider.OPENAI
     
+    model_name = None
+    
     if provider == LLMProvider.OPENAI:
+        model_name = os.getenv("OPENAI_MODEL", "gpt-4o")
         return ChatOpenAI(
-            model="gpt-4",
+            model=model_name,
             temperature=0.0
         )
     
     elif provider == LLMProvider.ANTHROPIC:
+        model_name = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
         return ChatAnthropic(
-            model_name="claude-3-sonnet-20240229",
+            model_name=model_name,
             temperature=0.0,
             timeout=100  # Increased timeout for complex tasks
         )
@@ -73,13 +77,14 @@ def get_llm_model(provider: str = None):
     elif provider == LLMProvider.AZURE:
         endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
         api_key = os.getenv('AZURE_OPENAI_KEY')
+        model_name = os.getenv("AZURE_OPENAI_MODEL", "gpt-4o")
         
         if not endpoint or not api_key:
             print("Warning: Azure OpenAI credentials not found. Falling back to OpenAI.")
             return get_llm_model(LLMProvider.OPENAI)
         
         return AzureChatOpenAI(
-            model="gpt-4",
+            model=model_name,
             api_version='2024-10-21',
             azure_endpoint=endpoint,
             api_key=SecretStr(api_key)
@@ -191,9 +196,9 @@ async def process_task(task: str, browser: Browser = None):
             llm=llm,
             browser=browser,
             controller=controller,
-            use_vision=True,
+            use_vision=False,  # Disable vision for now as it's causing issues
             save_conversation_path=log_file,
-            system_prompt_class=system_prompt_class  # Use custom system prompt
+            system_prompt_class=system_prompt_class
         )
         
         # Run the agent and get the result
@@ -242,14 +247,21 @@ async def main():
     os.makedirs("logs/recordings", exist_ok=True)
     os.makedirs("logs/traces", exist_ok=True)
     
-    # Create a persistent browser instance with configuration
-    async with Browser(config=browser_config) as browser:
+    try:
+        # Initialize browser
+        browser = Browser(config=browser_config)
+        
         while True:
             task = get_task()
             if task is None or task.lower() in ['exit', 'quit']:
                 break
             
             await process_task(task, browser)
+            
+    finally:
+        # Ensure browser is closed properly
+        if 'browser' in locals():
+            await browser.close()
 
 if __name__ == "__main__":
     try:
