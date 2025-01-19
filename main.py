@@ -103,12 +103,12 @@ def create_custom_controller():
         # Create results directory if it doesn't exist
         os.makedirs("logs/results", exist_ok=True)
         
-        # Save result to JSON file
+        # Save result to JSON file with proper encoding
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"logs/results/search_{timestamp}.json"
         
         with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(params.dict(), f, indent=2)
+            json.dump(params.dict(), f, indent=2, ensure_ascii=False)
             
         return f"Saved search result to {filename}"
     
@@ -126,6 +126,23 @@ def create_custom_controller():
         await element.screenshot(path=filename)
         
         return f"Saved element screenshot to {filename}"
+    
+    @controller.action('Extract content from page', requires_browser=True)
+    async def extract_content(browser: Browser):
+        page = browser.get_current_page()
+        content = await page.content()
+        
+        # Create content directory if it doesn't exist
+        os.makedirs("logs/content", exist_ok=True)
+        
+        # Save content to file with proper encoding
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"logs/content/page_{timestamp}.txt"
+        
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(content)
+            
+        return f"Saved page content to {filename}"
     
     return controller
 
@@ -174,6 +191,11 @@ async def process_task(task: str, browser: Browser = None):
         return
     
     try:
+        # Configure system encoding for Windows
+        if sys.platform == 'win32':
+            sys.stdout.reconfigure(encoding='utf-8')
+            sys.stderr.reconfigure(encoding='utf-8')
+        
         # Create logs directory if it doesn't exist
         os.makedirs("logs", exist_ok=True)
         
@@ -206,14 +228,17 @@ async def process_task(task: str, browser: Browser = None):
         history = await agent.run(max_steps=50)  # Limit maximum steps
         
         # Process and display results
-        print("\nResult:", history.final_result())
+        if history.final_result():
+            print("\nResult:", history.final_result())
         
         if history.has_errors():
             print("\nWarnings/Errors during execution:")
             for error in history.errors():
                 print(f"- {error}")
         
-        print("\nVisited URLs:", ", ".join(history.urls()))
+        if history.urls():
+            print("\nVisited URLs:", ", ".join(history.urls()))
+        
         print("\n" + "-"*50)
         
         return history
