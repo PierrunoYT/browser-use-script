@@ -8,26 +8,51 @@ An interactive CLI tool for browser automation using the [browser-use](https://g
 - Powered by GPT-4 and browser-use
 - Simple setup and usage
 - Graceful exit handling
+- Cross-platform support (Windows, macOS, Linux)
 
 ## Setup
 
 1. Clone this repository:
+
+**Windows:**
+```bash
+git clone https://github.com/PierrunoYT/browser-use-script
+cd browser-use-script
+```
+
+**macOS/Linux:**
 ```bash
 git clone https://github.com/PierrunoYT/browser-use-script
 cd browser-use-script
 ```
 
 2. Install the required packages:
+
+**Windows:**
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+```
+
+**macOS/Linux:**
+```bash
+pip3 install -r requirements.txt
 ```
 
 3. Install playwright browsers:
+
+**All platforms:**
 ```bash
 playwright install
 ```
 
 4. Set up your environment variables:
+
+**Windows:**
+```bash
+copy .env.example .env
+```
+
+**macOS/Linux:**
 ```bash
 cp .env.example .env
 ```
@@ -41,8 +66,15 @@ BROWSER_USE_API_KEY=your_browser_use_api_key_here  # Optional
 ## Usage
 
 1. Start the CLI:
+
+**Windows:**
 ```bash
 python main.py
+```
+
+**macOS/Linux:**
+```bash
+python3 main.py
 ```
 
 2. Enter your browser automation tasks when prompted. For example:
@@ -86,4 +118,4 @@ Contributions are welcome! Feel free to open issues for bugs or feature requests
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.
