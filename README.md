@@ -22,7 +22,9 @@ An interactive CLI tool for browser automation using the [browser-use](https://g
   - Optimized window sizing
   - Network idle waiting
   - Trace and debug capabilities
-- 🛠️ Custom Actions:
+  - Connect to existing Chrome instance
+  - Support for cloud browser providers
+- ��️ Custom Actions:
   - User confirmations
   - Search result saving
   - Element screenshots
@@ -184,3 +186,92 @@ Contributions are welcome! Feel free to open issues for bugs or feature requests
 ## License
 
 This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.
+
+## Browser Configuration Options
+
+### Standard Browser
+
+The default configuration launches a new browser instance with customizable settings:
+
+```bash
+# .env configuration
+BROWSER_HEADLESS=false
+BROWSER_VIEWPORT_WIDTH=1280
+BROWSER_VIEWPORT_HEIGHT=1100
+```
+
+### Connect to Existing Chrome
+
+Connect to your real Chrome browser with existing profiles and logged-in sessions:
+
+```bash
+# .env configuration
+CHROME_INSTANCE_PATH=C:\Program Files\Google\Chrome\Application\chrome.exe  # Windows
+CHROME_INSTANCE_PATH=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome  # macOS
+CHROME_INSTANCE_PATH=/usr/bin/google-chrome  # Linux
+```
+
+### Cloud Browser Providers
+
+Connect to cloud-based browser services for enhanced reliability:
+
+```bash
+# .env configuration
+# WebSocket connection (wss)
+BROWSER_WSS_URL=wss://your-provider.com/browser
+
+# Chrome DevTools Protocol (CDP)
+BROWSER_CDP_URL=http://your-cdp-provider.com
+```
+
+### Additional Browser Settings
+
+Fine-tune browser behavior with these settings:
+
+```bash
+# .env configuration
+# Page Load Settings
+MIN_PAGE_LOAD_TIME=0.5
+NETWORK_IDLE_TIME=1.0
+MAX_PAGE_LOAD_TIME=5.0
+
+# Security Settings
+BROWSER_DISABLE_SECURITY=true
+IGNORE_HTTPS_ERRORS=true
+JAVASCRIPT_ENABLED=true
+
+# Display Settings
+HIGHLIGHT_ELEMENTS=true
+VIEWPORT_EXPANSION=500
+BROWSER_LOCALE=en-US
+
+# URL Restrictions
+ALLOWED_DOMAINS=["example.com","another-domain.com"]
+
+# Debug and Recording
+SAVE_RECORDING_PATH=logs/recordings
+TRACE_PATH=logs/traces
+```
+
+## Common Browser Configurations
+
+### Local Development
+```bash
+BROWSER_HEADLESS=false
+BROWSER_DISABLE_SECURITY=true
+USE_VISION=true
+```
+
+### Production Environment
+```bash
+BROWSER_HEADLESS=true
+BROWSER_DISABLE_SECURITY=false
+USE_VISION=true
+ALLOWED_DOMAINS=["trusted-domain.com"]
+```
+
+### Using Existing Chrome Profile
+```bash
+CHROME_INSTANCE_PATH=/path/to/chrome
+USE_PERSISTENT_CONTEXT=true
+```

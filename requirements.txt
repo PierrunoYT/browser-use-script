@@ -6,3 +6,4 @@ python-dotenv>=1.0.0
 pydantic>=2.0.0
 lxml>=4.9.0
 lxml-html-clean>=0.3.0
+asyncio>=3.4.3
