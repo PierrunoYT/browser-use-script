@@ -144,6 +144,57 @@ def create_custom_controller():
             
         return f"Saved page content to {filename}"
     
+    @controller.action('Extract table data', requires_browser=True)
+    async def extract_table(selector: str, browser: Browser):
+        page = browser.get_current_page()
+        table = await page.query_selector(selector)
+        if not table:
+            return "Table not found"
+        
+        # Extract table data
+        data = await table.evaluate('''table => {
+            const rows = Array.from(table.querySelectorAll('tr'));
+            return rows.map(row => {
+                const cells = Array.from(row.querySelectorAll('td, th'));
+                return cells.map(cell => cell.textContent.trim());
+            });
+        }''')
+        
+        # Save to CSV
+        os.makedirs("logs/tables", exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"logs/tables/table_{timestamp}.csv"
+        
+        import csv
+        with open(filename, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+        
+        return f"Saved table data to {filename}"
+
+    @controller.action('Download file', requires_browser=True)
+    async def download_file(url: str, browser: Browser):
+        page = browser.get_current_page()
+        
+        # Create downloads directory
+        os.makedirs("logs/downloads", exist_ok=True)
+        
+        # Configure download behavior
+        download = await page.expect_download(timeout=30000)
+        await page.goto(url)
+        
+        # Wait for download to complete
+        download_path = await download.path()
+        if not download_path:
+            return "Download failed"
+            
+        # Move to downloads directory
+        filename = os.path.basename(download_path)
+        target_path = os.path.join("logs/downloads", filename)
+        os.rename(download_path, target_path)
+        
+        return f"Downloaded file to {target_path}"
+
     return controller
 
 # Add custom system prompts
@@ -175,6 +226,20 @@ class DataCollectionPrompt(SystemPrompt):
 """
         return f'{existing_rules}\n{collection_rules}'
 
+class ResearchPrompt(SystemPrompt):
+    def important_rules(self) -> str:
+        existing_rules = super().important_rules()
+        
+        research_rules = """
+9. RESEARCH RULES:
+   - SYSTEMATICALLY explore topics in depth
+   - VERIFY information from multiple sources
+   - DOCUMENT all findings with proper citations
+   - ORGANIZE research data hierarchically
+   - SUMMARIZE key findings clearly
+"""
+        return f'{existing_rules}\n{research_rules}'
+
 def get_system_prompt(prompt_type: str = None):
     """Get the appropriate system prompt based on configuration"""
     prompt_type = prompt_type or os.getenv("SYSTEM_PROMPT", "default")
@@ -183,6 +248,8 @@ def get_system_prompt(prompt_type: str = None):
         return SafetyFirstPrompt
     elif prompt_type.lower() == "collection":
         return DataCollectionPrompt
+    elif prompt_type.lower() == "research":
+        return ResearchPrompt
     else:
         return SystemPrompt  # Default prompt
 
@@ -258,13 +325,13 @@ async def main():
     
     # Configure browser settings
     browser_config = BrowserConfig(
-        headless=False,  # Show browser UI
-        disable_security=True,  # Disable security for better compatibility
-        new_context_config=BrowserContextConfig(
-            wait_for_network_idle_page_load_time=3.0,
-            browser_window_size={'width': 1280, 'height': 1100},
-            save_recording_path="logs/recordings",
-            trace_path="logs/traces"
+        headless=False,  # Set to True for headless mode
+        slow_mo=50,  # Add delay between actions for visibility
+        viewport={'width': 1280, 'height': 800},
+        context_config=BrowserContextConfig(
+            ignore_https_errors=True,
+            java_script_enabled=True,
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         )
     )
     
@@ -274,15 +341,24 @@ async def main():
     
     try:
         # Initialize browser
-        browser = Browser(config=browser_config)
-        
-        while True:
-            task = get_task()
-            if task is None or task.lower() in ['exit', 'quit']:
-                break
-            
-            await process_task(task, browser)
-            
+        async with Browser(config=browser_config) as browser:
+            while True:
+                task = get_task()
+                if task is None or task.lower() in ['exit', 'quit']:
+                    break
+                
+                try:
+                    history = await process_task(task, browser)
+                    if not history:
+                        continue
+                    
+                    # Save conversation history
+                    if history.save_conversation_path:
+                        print(f"\nConversation saved to: {history.save_conversation_path}")
+                    
+                except Exception as e:
+                    print(f"\nError: {str(e)}")
+                    continue
     finally:
         # Ensure browser is closed properly
         if 'browser' in locals():
