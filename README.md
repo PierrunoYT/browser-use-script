@@ -8,15 +8,22 @@ An interactive CLI tool for browser automation using the [browser-use](https://g
   - OpenAI GPT-4o (default)
   - Anthropic Claude 3.5 Sonnet (20241022)
   - Azure OpenAI Services
+  - Gemini (coming soon)
+  - DeepSeek-V3 (coming soon)
+  - DeepSeek-R1 (coming soon)
+  - Ollama (coming soon)
 - 🔒 Configurable System Behaviors:
   - Default mode for standard automation
   - Safety First mode with enhanced security
   - Data Collection mode for comprehensive gathering
+  - Research mode for systematic exploration
+  - Wikipedia First mode for research tasks
 - 📸 Advanced Logging and Recording:
   - Automatic screenshots of elements
   - Session recordings
   - Comprehensive conversation logs
   - Structured data storage
+  - Debug-level thought process logging
 - 🌐 Customizable Browser Settings:
   - Non-headless mode for visibility
   - Optimized window sizing
@@ -24,11 +31,51 @@ An interactive CLI tool for browser automation using the [browser-use](https://g
   - Trace and debug capabilities
   - Connect to existing Chrome instance
   - Support for cloud browser providers
-- ��️ Custom Actions:
+- 🛠️ Custom Actions:
   - User confirmations
   - Search result saving
   - Element screenshots
   - Structured data handling
+  - Table data extraction
+  - File downloads
+  - Content extraction
+
+## Custom Functions
+
+The tool provides several built-in custom functions that can be enabled or disabled:
+
+- `confirm`: Ask for user confirmation before actions
+- `save_search`: Save structured search results
+- `screenshot`: Take screenshots of specific elements
+- `extract_content`: Save page content
+- `extract_table`: Extract and save table data as CSV
+- `download`: Download files from URLs
+
+You can exclude specific functions using the `EXCLUDED_ACTIONS` environment variable:
+
+```bash
+# Exclude file downloads and table extraction
+EXCLUDED_ACTIONS=["download", "extract_table"]
+```
+
+## Output Formats
+
+The tool supports structured output formats using Pydantic models. Currently available formats:
+
+### Posts Format
+```python
+class Post:
+    post_title: str
+    post_url: str
+    num_comments: int
+    hours_since_post: int
+```
+
+Enable structured output by setting the `OUTPUT_FORMAT` environment variable:
+```bash
+# Use structured posts format
+OUTPUT_FORMAT=posts
+```
 
 ## Prerequisites
 
@@ -274,4 +321,44 @@ ALLOWED_DOMAINS=["trusted-domain.com"]
 ```bash
 CHROME_INSTANCE_PATH=/path/to/chrome
 USE_PERSISTENT_CONTEXT=true
+```
+
+## Environment Variables
+
+In addition to the basic configuration, you can customize:
+
+### Function Control
+```bash
+# Exclude specific functions
+EXCLUDED_ACTIONS=[]  # JSON array of action IDs
+
+# Output format
+OUTPUT_FORMAT=  # Options: posts, or leave empty for text
+```
+
+### Debug Settings
+```bash
+# Enable debug logging for model thoughts
+LOG_LEVEL=DEBUG
+
+# Save browser recordings
+SAVE_RECORDING_PATH=logs/recordings
+TRACE_PATH=logs/traces
+```
+
+## Output Directory Structure
+
+The tool organizes outputs in the following structure:
+
+```
+logs/
+├── browser_use.log         # Main log file
+├── conversation_*.json     # Conversation history
+├── results/               # Structured search results
+├── screenshots/           # Element screenshots
+├── content/              # Extracted page content
+├── tables/              # CSV table data
+├── downloads/           # Downloaded files
+├── recordings/         # Browser session recordings
+└── traces/            # Debug trace files
 ```
