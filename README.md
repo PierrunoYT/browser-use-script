@@ -1,61 +1,79 @@
 # Browser Use CLI
 
-An interactive CLI tool for browser automation using the [browser-use](https://github.com/browser-use/browser-use) library. This tool allows you to control your browser using natural language commands through an interactive command-line interface.
+An enhanced interactive CLI tool for browser automation using the official [browser-use](https://github.com/browser-use/browser-use) library. This tool provides a user-friendly interface to control your browser using natural language commands with advanced features and customization options.
+
+**🚀 Now aligned with browser-use v0.2.2 - the latest official release!**
 
 ## Features
 
-- 🤖 Multiple LLM Provider Support:
+- 🤖 **Multiple LLM Provider Support**:
   - OpenAI GPT-4o (default)
   - Anthropic Claude 3.5 Sonnet (20241022)
   - Azure OpenAI Services
-  - Gemini (coming soon)
-  - DeepSeek-V3 (coming soon)
-  - DeepSeek-R1 (coming soon)
-  - Ollama (coming soon)
-- 🔒 Configurable System Behaviors:
+  - Google Gemini (via browser-use)
+  - DeepSeek (via browser-use)
+  - And more through browser-use's LLM integrations
+
+- 🔒 **Configurable System Behaviors**:
   - Default mode for standard automation
   - Safety First mode with enhanced security
   - Data Collection mode for comprehensive gathering
   - Research mode for systematic exploration
   - Wikipedia First mode for research tasks
-- 📸 Advanced Logging and Recording:
-  - Automatic screenshots of elements
-  - Session recordings
-  - Comprehensive conversation logs
+
+- 📸 **Advanced Logging and Recording**:
+  - Automatic conversation logging
+  - Session recordings (when configured)
+  - Comprehensive task execution logs
   - Structured data storage
-  - Debug-level thought process logging
-- 🌐 Customizable Browser Settings:
-  - Non-headless mode for visibility
-  - Optimized window sizing
-  - Network idle waiting
-  - Trace and debug capabilities
-  - Connect to existing Chrome instance
-  - Support for cloud browser providers
-- 🛠️ Custom Actions:
-  - User confirmations
-  - Search result saving
-  - Element screenshots
-  - Structured data handling
-  - Table data extraction
-  - File downloads
-  - Content extraction
+  - Debug-level logging support
 
-## Custom Functions
+- 🌐 **Modern Browser Integration**:
+  - Uses browser-use's optimized browser handling
+  - Vision support for visual understanding
+  - Configurable browser settings
+  - Support for headless and headed modes
+  - Cloud browser provider compatibility
 
-The tool provides several built-in custom functions that can be enabled or disabled:
+- 🛠️ **Enhanced User Experience**:
+  - Interactive CLI with clear feedback
+  - Structured output formats (JSON, etc.)
+  - Error handling and recovery
+  - Graceful shutdown handling
+  - Cross-platform compatibility
 
-- `confirm`: Ask for user confirmation before actions
-- `save_search`: Save structured search results
-- `screenshot`: Take screenshots of specific elements
-- `extract_content`: Save page content
-- `extract_table`: Extract and save table data as CSV
-- `download`: Download files from URLs
+## Quick Start
 
-You can exclude specific functions using the `EXCLUDED_ACTIONS` environment variable:
+### Simple Usage
+
+For basic browser automation, you can use the simple example:
+
+```python
+import asyncio
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from browser_use import Agent
+
+load_dotenv()
+
+async def main():
+    llm = ChatOpenAI(model="gpt-4o")
+    agent = Agent(
+        task="Compare the price of gpt-4o and DeepSeek-V3",
+        llm=llm,
+    )
+    result = await agent.run()
+    print(result)
+
+asyncio.run(main())
+```
+
+### Interactive CLI
+
+For an enhanced interactive experience with multiple features:
 
 ```bash
-# Exclude file downloads and table extraction
-EXCLUDED_ACTIONS=["download", "extract_table"]
+python main.py
 ```
 
 ## Output Formats
@@ -79,92 +97,80 @@ OUTPUT_FORMAT=posts
 
 ## Prerequisites
 
-1. **API Keys Required**:
-   - OpenAI API Key (default provider, for GPT-4o)
-   - Anthropic API Key (optional, for Claude 3.5 Sonnet)
-   - Azure OpenAI credentials (optional)
-2. **Browser Use API Key** (optional but recommended)
+1. **Python 3.11 or higher** (required by browser-use)
+2. **API Keys** for your chosen LLM provider:
+   - OpenAI API Key (for GPT-4o - default)
+   - Anthropic API Key (for Claude 3.5 Sonnet)
+   - Azure OpenAI credentials (for Azure OpenAI)
+   - Google API Key (for Gemini)
+   - DeepSeek API Key (for DeepSeek models)
 
 ## Setup
 
-1. Clone this repository:
+### 1. Clone the Repository
 
-**Windows:**
 ```bash
 git clone https://github.com/PierrunoYT/browser-use-script
 cd browser-use-script
 ```
 
-**macOS/Linux:**
+### 2. Install Dependencies
+
+**Using pip:**
 ```bash
-git clone https://github.com/PierrunoYT/browser-use-script
-cd browser-use-script
+pip install -r requirements.txt
 ```
 
-2. Install dependencies:
-
-**Windows:**
+**Using uv (recommended):**
 ```bash
-python -m pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
-**macOS/Linux:**
+### 3. Install Playwright Browsers
+
 ```bash
-pip3 install -r requirements.txt
+playwright install chromium --with-deps --no-shell
 ```
 
-3. Install playwright browsers:
+### 4. Configure Environment
 
-**All platforms:**
 ```bash
-playwright install
+# Copy the example environment file
+cp .env.example .env  # On macOS/Linux
+copy .env.example .env  # On Windows
 ```
 
-4. Configure environment:
+### 5. Edit `.env` with your settings:
 
-**Windows:**
 ```bash
-copy .env.example .env
-```
+# Required: Add your API key
+OPENAI_API_KEY=your_openai_api_key_here
 
-**macOS/Linux:**
-```bash
-cp .env.example .env
-```
-
-5. Edit `.env` with your settings:
-```bash
-# Required: Choose your LLM provider and add API key
-LLM_PROVIDER=openai  # Options: openai, anthropic, azure
-OPENAI_API_KEY=your_key_here
+# Optional: Configure LLM provider
+LLM_PROVIDER=openai  # Options: openai, anthropic, azure, google, deepseek
 
 # Optional: Configure system behavior
-SYSTEM_PROMPT=default  # Options: default, safety, collection
+SYSTEM_PROMPT=default  # Options: default, safety, collection, research, wiki
 
-# Optional: Alternative LLM providers
-ANTHROPIC_API_KEY=your_key_here  # Required for Claude 3.5 Sonnet
-AZURE_OPENAI_ENDPOINT=your_endpoint_here
-AZURE_OPENAI_KEY=your_key_here
+# Optional: Browser settings
+BROWSER_HEADLESS=false
+USE_VISION=true
 
-# Optional: Telemetry settings
+# Optional: Telemetry
 ANONYMIZED_TELEMETRY=true
 ```
 
 ## Usage
 
-1. Start the CLI:
+### Interactive CLI
 
-**Windows:**
+Start the enhanced CLI for interactive browser automation:
+
 ```bash
 python main.py
 ```
 
-**macOS/Linux:**
-```bash
-python3 main.py
-```
-
-2. The tool will display your current configuration:
+The tool will display your current configuration:
 ```
 Welcome to Browser Use CLI!
 Using LLM Provider: OPENAI
@@ -173,10 +179,22 @@ Enter your tasks and watch the browser automation in action.
 Press Ctrl+C to exit.
 ```
 
-3. Enter your tasks in natural language. Examples:
-- "Search for the latest AI news and save the results"
-- "Go to Wikipedia and find information about quantum computing"
-- "Visit a tech blog and take screenshots of interesting articles"
+### Simple Script Usage
+
+For basic automation, use the simple example:
+
+```bash
+python simple_example.py
+```
+
+### Example Tasks
+
+Enter your tasks in natural language. Here are some examples:
+
+- **Web Research**: "Search for the latest AI news and summarize the top 3 articles"
+- **Information Gathering**: "Go to Wikipedia and find information about quantum computing"
+- **Comparison Tasks**: "Compare the pricing of OpenAI GPT-4 and Anthropic Claude"
+- **Data Collection**: "Visit Hacker News and get the top 5 posts with their titles and URLs"
 
 ## System Prompt Modes
 
@@ -217,14 +235,39 @@ Here are some example tasks you can try:
 - "Go to Google Docs and create a new document titled 'Meeting Notes'"
 - "Visit GitHub and star the browser-use repository"
 
+## What's New in This Version
+
+### 🚀 Aligned with Official browser-use v0.2.2
+
+- **Modern API**: Updated to use the latest browser-use API patterns
+- **Simplified Architecture**: Removed complex custom controller logic in favor of browser-use's built-in capabilities
+- **Better Performance**: Leverages browser-use's optimized browser handling
+- **Enhanced Compatibility**: Full compatibility with the official browser-use ecosystem
+
+### 🔄 Migration from Previous Versions
+
+If you're upgrading from an older version of this script:
+
+1. **Dependencies**: The script now uses the official browser-use package instead of custom implementations
+2. **Configuration**: Environment variables remain largely the same for backward compatibility
+3. **Custom Functions**: Complex custom functions have been simplified to align with browser-use patterns
+4. **API Changes**: The core Agent API is now simpler and more reliable
+
 ## Dependencies
 
-- langchain-openai
-- langchain-anthropic
-- browser-use
-- playwright
-- python-dotenv
-- pydantic
+### Core Dependencies
+- **browser-use** >= 0.2.2 (official browser automation library)
+- **langchain-openai** >= 0.3.11 (OpenAI LLM integration)
+- **langchain-anthropic** >= 0.3.3 (Anthropic Claude integration)
+- **langchain-core** >= 0.3.49 (LangChain core functionality)
+- **playwright** >= 1.52.0 (browser automation engine)
+- **python-dotenv** >= 1.0.1 (environment variable management)
+- **pydantic** >= 2.10.4 (data validation and serialization)
+
+### Optional Dependencies
+- **rich** >= 14.0.0 (enhanced CLI formatting)
+- **click** >= 8.1.8 (CLI framework)
+- **sentence-transformers** >= 4.0.2 (for memory features)
 
 ## Contributing
 
